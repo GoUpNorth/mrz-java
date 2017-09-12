@@ -107,4 +107,12 @@ public class MrzParserTest {
         MrzRecord record = MrzParser.parse(invalidExpiryDateMrz);
         assertEquals(false, record.expirationDate.isValidDate());
     }
+
+    @Test
+    public void testMrzIncorrectDates() {
+        String incorrectDatesMrz = "P<FRASPECIMEN<<NATACHA<<<<<<<<<<<<<<<<<<<<<<\n60RF197658FRA84071ZZFZ007058<<<<<<<<<<<<<<O6";
+        MrzRecord record = MrzParser.parse(incorrectDatesMrz);
+        assertNull(record.dateOfBirth);
+        assertNull(record.expirationDate);
+    }
 }

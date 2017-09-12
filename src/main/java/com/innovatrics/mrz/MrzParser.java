@@ -197,7 +197,8 @@ public class MrzParser {
             }
             return new MrzDate(year, month, day);
         } catch (NumberFormatException ex) {
-            throw new MrzParseException("Failed to parse MRZ date " + rawValue(range) + ": " + ex, mrz, r, format);
+            log.debug("Failed to parse MRZ date " + rawValue(range) + ": " + ex.getMessage(), ex);
+            return null;
         }
     }
 
