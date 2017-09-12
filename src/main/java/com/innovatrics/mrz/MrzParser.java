@@ -62,7 +62,7 @@ public class MrzParser {
     /**
      * @author jllarraz@github
      * Parses the MRZ name in form of SURNAME<<FIRSTNAME<
-     * @Param range the range
+     * @param range the range
      * @return array of [surname, first_name], never null, always with a length of 2.
      */
     public String[] parseName(MrzRange range) {
@@ -72,14 +72,13 @@ public class MrzParser {
             str = str.substring(0, str.length() - 1);
         }
         final String[] names = str.split("<<");
-        String surname = "";
+        String surname;
         String givenNames = "";
         surname = parseString(new MrzRange(range.column, range.column + names[0].length(), range.row));
         if(names.length==1){
             givenNames = parseString(new MrzRange(range.column, range.column + names[0].length(), range.row));
             surname = "";
-        }
-        else if(names.length>1){
+        } else if(names.length>1) {
             surname = parseString(new MrzRange(range.column, range.column + names[0].length(), range.row));
             givenNames = parseString(new MrzRange(range.column + names[0].length() + 2, range.column + str.length(), range.row));
         }
@@ -103,7 +102,7 @@ public class MrzParser {
      * Checks that given range contains valid characters.
      * @param range the range to check.
      */
-    public void checkValidCharacters(MrzRange range) {
+    private void checkValidCharacters(MrzRange range) {
         final String str = rawValue(range);
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
@@ -149,7 +148,7 @@ public class MrzParser {
      */
     public boolean checkDigit(int col, int row, String str, String fieldName) {
 
-        /**
+        /*
          * If the check digit validation fails, this will contain the location.
          */
         MrzRange invalidCheckdigit = null;
@@ -178,28 +177,9 @@ public class MrzParser {
         if (range.length() != 6) {
             throw new IllegalArgumentException("Parameter range: invalid value " + range + ": must be 6 characters long");
         }
-        MrzRange r = null;
-        try {
-            r = new MrzRange(range.column, range.column + 2, range.row);
-            final int year = Integer.parseInt(rawValue(r));
-            if (year < 0 || year > 99) {
-                log.debug("Invalid year value " + year + ": must be 0..99");
-            }
-            r = new MrzRange(range.column + 2, range.column + 4, range.row);
-            final int month = Integer.parseInt(rawValue(r));
-            if (month < 1 || month > 12) {
-                log.debug("Invalid month value " + month + ": must be 1..12");
-            }
-            r = new MrzRange(range.column + 4, range.column + 6, range.row);
-            final int day = Integer.parseInt(rawValue(r));
-            if (day < 1 || day > 31) {
-                log.debug("Invalid day value " + day + ": must be 1..31");
-            }
-            return new MrzDate(year, month, day);
-        } catch (NumberFormatException ex) {
-            log.debug("Failed to parse MRZ date " + rawValue(range) + ": " + ex.getMessage(), ex);
-            return null;
-        }
+        return new MrzDate(rawValue(new MrzRange(range.column, range.column + 2, range.row)),
+                rawValue(new MrzRange(range.column + 2, range.column + 4, range.row)),
+                rawValue(new MrzRange(range.column + 4, range.column + 6, range.row)));
     }
 
     /**
@@ -269,7 +249,7 @@ public class MrzParser {
     }
 
 
-    private static final Map<String, String> EXPAND_CHARACTERS = new HashMap<String, String>();
+    private static final Map<String, String> EXPAND_CHARACTERS = new HashMap<>();
 
     static {
         EXPAND_CHARACTERS.put("\u00C4", "AE"); // Ä
@@ -399,7 +379,7 @@ public class MrzParser {
     /**
      * The filler character, '&lt;'.
      */
-    public static final char FILLER = '<';
+    private static final char FILLER = '<';
 
     private static String toName(String[] surnames, String[] given) {
         final StringBuilder sb = new StringBuilder();

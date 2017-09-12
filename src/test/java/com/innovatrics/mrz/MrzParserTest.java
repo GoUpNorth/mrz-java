@@ -90,29 +90,35 @@ public class MrzParserTest {
     public void testValidDates() {
         String validBirthDateMrz = "P<GBRUK<SPECIMEN<<ANGELA<ZOE<<<<<<<<<<<<<<<<\n9250764733GBR8809317F2007162<<<<<<<<<<<<<<08";
         MrzRecord record = MrzParser.parse(validBirthDateMrz);
-        assertEquals(true, record.dateOfBirth.isValidDate());
-        assertEquals(true, record.expirationDate.isValidDate());
+        assertEquals(true, record.dateOfBirth.isDateValid());
+        assertEquals(true, record.expirationDate.isDateValid());
     }
 
     @Test
     public void testMrzInvalidBirthDate() {
         String invalidBirthDateMrz = "P<GBRUK<SPECIMEN<<ANGELA<ZOE<<<<<<<<<<<<<<<<\n9250764733GBR8809417F2007162<<<<<<<<<<<<<<08";
         MrzRecord record = MrzParser.parse(invalidBirthDateMrz);
-        assertEquals(false, record.dateOfBirth.isValidDate());
+        assertEquals(false, record.dateOfBirth.isDateValid());
     }
 
     @Test
     public void testMrzInvalidExpiryDate() {
         String invalidExpiryDateMrz = "P<GBRUK<SPECIMEN<<ANGELA<ZOE<<<<<<<<<<<<<<<<\n9250764733GBR8809117F2007462<<<<<<<<<<<<<<08";
         MrzRecord record = MrzParser.parse(invalidExpiryDateMrz);
-        assertEquals(false, record.expirationDate.isValidDate());
+        assertEquals(false, record.expirationDate.isDateValid());
     }
 
     @Test
     public void testMrzIncorrectDates() {
         String incorrectDatesMrz = "P<FRASPECIMEN<<NATACHA<<<<<<<<<<<<<<<<<<<<<<\n60RF197658FRA84071ZZFZ007058<<<<<<<<<<<<<<O6";
         MrzRecord record = MrzParser.parse(incorrectDatesMrz);
-        assertNull(record.dateOfBirth);
-        assertNull(record.expirationDate);
+        assertEquals(84, record.dateOfBirth.year);
+        assertEquals(7, record.dateOfBirth.month);
+        assertEquals(-1, record.dateOfBirth.day);
+        assertEquals("84071Z", record.dateOfBirth.toMrz());
+        assertEquals(-1, record.expirationDate.year);
+        assertEquals(7, record.expirationDate.month);
+        assertEquals(5, record.expirationDate.day);
+        assertEquals("Z00705", record.expirationDate.toMrz());
     }
 }

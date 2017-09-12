@@ -39,26 +39,85 @@ public class MrzDate implements Serializable, Comparable<MrzDate> {
      * <p/>
      * Note: I am unable to find a specification of conversion of this value to a full year value.
      */
-    public final int year;
+    public int year;
     /**
      * Month, 1-12.
      */
-    public final int month;
+    public int month;
     /**
      * Day, 1-31.
      */
-    public final int day;
+    public int day;
 
     /**
      * Is the date valid or not
      */
-    private final boolean isValidDate;
+    private final boolean isDateValid;
 
+    /**
+     * Raw year
+     */
+    private final String rawYear;
+    /**
+     * Raw month
+     */
+    private final String rawMonth;
+    /**
+     * Raw day
+     */
+    private final String rawDay;
+
+
+    /**
+     *MrzDate
+     * @param year Parsed year
+     * @param month  Parsed month
+     * @param day  Parsed day
+     */
     public MrzDate(int year, int month, int day) {
         this.year = year;
         this.month = month;
         this.day = day;
-        isValidDate = check();
+
+        rawYear = String.format("%02d", year);
+        rawMonth = String.format("%02d", month);
+        rawDay = String.format("%02d", day);
+
+        isDateValid = check();
+    }
+
+    /**
+     * MrzDate
+     * @param rawYear Raw year to parse
+     * @param rawMonth Raw month to parse
+     * @param rawDay Raw day to parse
+     */
+    public MrzDate(String rawYear, String rawMonth, String rawDay){
+        this.rawYear = rawYear;
+        this.rawMonth = rawMonth;
+        this.rawDay = rawDay;
+
+        try {
+            this.year = Integer.parseInt(rawYear);
+        } catch (NumberFormatException e) {
+            log.debug("Failed to parse MRZ date year " + rawYear, e);
+            this.year = -1;
+        }
+        try {
+            this.month = Integer.parseInt(rawMonth);
+        } catch (NumberFormatException e) {
+            log.debug("Failed to parse MRZ date month " + rawMonth, e);
+            this.month = -1;
+        }
+
+        try {
+            this.day = Integer.parseInt(rawDay);
+        } catch (NumberFormatException e)  {
+            log.debug("Failed to parse MRZ date day " + rawDay, e);
+            this.day = -1;
+        }
+
+        isDateValid = check();
     }
 
     @Override
@@ -67,7 +126,7 @@ public class MrzDate implements Serializable, Comparable<MrzDate> {
     }
 
     public String toMrz() {
-        return String.format("%02d%02d%02d", year, month, day);
+        return String.format("%s%s%s", rawYear, rawMonth, rawDay);
     }
 
     private boolean check() {
@@ -105,6 +164,15 @@ public class MrzDate implements Serializable, Comparable<MrzDate> {
         if (this.day != other.day) {
             return false;
         }
+        if(!this.rawYear.contentEquals(other.rawYear)) {
+            return false;
+        }
+        if(!this.rawMonth.contentEquals(other.rawMonth)) {
+            return false;
+        }
+        if(!this.rawDay.contentEquals(other.rawDay)){
+            return false;
+        }
         return true;
     }
 
@@ -118,14 +186,14 @@ public class MrzDate implements Serializable, Comparable<MrzDate> {
     }
 
     public int compareTo(MrzDate o) {
-        return Integer.valueOf(year * 10000 + month * 100 + day).compareTo(o.year * 10000 + o.month * 100 + o.day);
+        return Integer.compare(year * 10000 + month * 100 + day, o.year * 10000 + o.month * 100 + o.day);
     }
 
     /**
      * Returns the date validity
      * @return Returns a boolean true if the parsed date is valid, false otherwise
      */
-    public boolean isValidDate() {
-        return isValidDate;
+    public boolean isDateValid() {
+        return isDateValid;
     }
 }

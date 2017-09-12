@@ -63,7 +63,7 @@ public class MrzDateTest {
         assertEquals(88, date.year);
         assertEquals(9, date.month);
         assertEquals(41, date.day);
-        assertEquals(false, date.isValidDate());
+        assertEquals(false, date.isDateValid());
     }
 
     @Test
@@ -72,6 +72,16 @@ public class MrzDateTest {
         assertEquals(88, date.year);
         assertEquals(9, date.month);
         assertEquals(30, date.day);
-        assertEquals(true, date.isValidDate());
+        assertEquals(true, date.isDateValid());
+    }
+
+    @Test
+    public void testUnparseableDate() {
+        MrzDate date = new MrzDate("BB", "09", "30");
+        assertEquals(-1, date.year);
+        assertEquals(9, date.month);
+        assertEquals(30, date.day);
+        assertEquals("BB0930", date.toMrz());
+        assertEquals(false, date.isDateValid());
     }
 }
